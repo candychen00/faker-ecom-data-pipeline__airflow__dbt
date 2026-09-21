@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main  # 當推送到 main 分支時觸發
-    paths:
-      - "dbt/**"
   workflow_dispatch:
 
 
@@ -55,7 +53,7 @@ jobs:
       # 5. 建置 Docker 映像檔
       - name: Build Docker Image
         run: |
-          docker build -t ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} .
+          docker build -t ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} ./dbt
           docker tag ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
                      ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:latest
 
@@ -85,19 +83,19 @@ jobs:
 
       - name: Install dbt packages (Optional)
         run: |
-          cd my_dbt_project
+          cd dbt/my_dbt_project
           dbt deps
 
 
       - name: Build dbt & test dbt
         run: |
-          cd my_dbt_project
+          cd dbt/my_dbt_project
           dbt build
 
 
       - name: Generate dbt Docs
         run: |
-          cd my_dbt_project
+          cd dbt/my_dbt_project
           dbt docs generate
 
 
@@ -108,7 +106,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'my_dbt_project/target' # dbt docs generate 會將產物放在 target/ 目錄
+          path: 'dbt/my_dbt_project/target' # dbt docs generate 會將產物放在 target/ 目錄
 
 
       - name: Deploy to GitHub Pages
