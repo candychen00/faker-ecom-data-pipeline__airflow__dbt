@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main  # 當推送到 main 分支時觸發
+    paths:
+      - 'dbt/**'
   workflow_dispatch:
 
 

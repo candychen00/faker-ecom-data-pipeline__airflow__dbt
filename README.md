@@ -7,6 +7,19 @@ A containerized, GCP-native data pipeline that generates synthetic e-commerce da
 <br>
 <br>
 
+## Tech stack
+
+- **Orchestration:** Apache Airflow 3.3.1 (LocalExecutor)
+- **Transformation:** `dbt-bigquery`
+- **Compute:** Docker Compose (for Airflow) , Cloud Run Jobs (for dbt)
+- **Warehouse/Storage:** BigQuery, Google Cloud Storage
+- **CI/CD:** GitHub Actions → Google Artifact Registry → Google Cloud Run Jobs → GitHub Pages (deploy dbt docs)
+- **Data generation:** [Faker](https://faker.readthedocs.io/)
+- **Tests:** `dbt_utils`, `dbt_expectations`
+
+<br>
+<br>
+
 ## Architecture
 
 ```
@@ -136,12 +149,3 @@ This pattern chains the customers, products, and orders DAGs into a single end-t
 <br>
 <br>
 
-## Tech stack
-
-- **Orchestration:** Apache Airflow 3.3.1 (LocalExecutor)
-- **Transformation:** `dbt-bigquery`
-- **Tests:** `dbt_utils`, `dbt_expectations`
-- **Warehouse/Storage:** BigQuery, Google Cloud Storage
-- **Compute:** Docker Compose (for Airflow) , Cloud Run Jobs (for dbt)
-- **CI/CD:** GitHub Actions → Google Artifact Registry → Google Cloud Run Jobs → GitHub Pages (deploy dbt docs)
-- **Data generation:** [Faker](https://faker.readthedocs.io/)
