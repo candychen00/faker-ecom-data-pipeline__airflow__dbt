@@ -19,7 +19,7 @@ BQ_TABLE_NAME ='raw_products'
 
 @dag(
     schedule=None,
-    tags=['klc']
+    tags=['ecom_project']
 )
 def generate_fake_products():
 

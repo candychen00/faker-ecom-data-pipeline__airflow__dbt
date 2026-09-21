@@ -19,3 +19,5 @@ logs/
 target/
 dbt_packages/
 .user.yml
+
+airflow/dags/test_dag.py

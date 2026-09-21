@@ -23,13 +23,13 @@ BQ_TABLE_NAME='raw_orders'
 
 
 @dag(
-    tags = ['klc'],
+    tags = ['ecom_project'],
     catchup = False,
     schedule = None,
     # start_date= pendulum.datetime(2026,9,1,0,0,0 , tz='Asia/Taipei'),
     # schedule="@daily",
 )
-def generate_orders_v3():
+def generate_fake_orders():
 
     @task
     def query_products():
@@ -214,4 +214,4 @@ def generate_orders_v3():
 
     [query_products() , query_customers()] >> generate_orders() >> save_to_tmp_folder() >> upload_to_gcs >> upload_to_bq_raw >> dbt_test_raw_orders >> dbt_run_src_fct_orders >> dbt_test_fct_orders >> trigger_dag_run_marts_table
 
-generate_orders_v3()
+generate_fake_orders()

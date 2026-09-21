@@ -14,7 +14,7 @@ BQ_TABLE_NAME='raw_orders'
 
 
 @dag(
-    tags = ['klc'],
+    tags = ['ecom_project'],
     catchup = False,
     schedule = None,
     # start_date= pendulum.datetime(2026,9,1,0,0,0 , tz='Asia/Taipei'),

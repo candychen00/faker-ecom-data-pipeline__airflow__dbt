@@ -22,7 +22,7 @@ BQ_TABLE_NAME='raw_customers'
 
 @dag(
     schedule=None,
-    tags=['klc']
+    tags=['ecom_project']
 )
 def generate_fake_customers():
 

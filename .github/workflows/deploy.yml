@@ -23,19 +23,18 @@ jobs:
       id-token: write
 
     steps:
-      # 1. 檢出程式碼
+      # 檢出程式碼
       - name: Checkout code
         uses: actions/checkout@v4
 
 
-      # 2. 登入 GCP (使用 JSON Key)
+      # 登入 GCP (使用 JSON Key)
       - name: Google Auth
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
 
-      # 3. 設定 Google Cloud SDK 與 Docker 認證
       - name: Set up Cloud SDK & Docker Auth
         run: |
           gcloud auth configure-docker ${{ env.GAR_LOCATION }}-docker.pkg.dev --quiet
@@ -58,23 +57,20 @@ jobs:
           fi
 
 
-      # 5. 建置 Docker 映像檔
-      - name: Build Docker Image
+      - name: Build GAR Docker Image
         run: |
           docker build -t ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} ./dbt
           docker tag ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
                      ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:latest
 
 
-      # 6. 推送映像檔至 Artifact Registry
-      - name: Push Docker Image to GAR
+      - name: Push Docker Image to Google Artifact Registry (GAR)
         run: |
           docker push ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           docker push ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:latest 
 
 
-      # 7. 把 image 推到 Cloud run job
-      - name: Deploy to Cloud Run Job
+      - name: Deploy image to Cloud Run Job
         run: |
           gcloud run jobs update ${{ env.JOB_NAME }} \
             --image=${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
@@ -89,16 +85,16 @@ jobs:
           pip install dbt-bigquery
 
 
-      - name: Install dbt packages (Optional)
+      - name: Install dbt packages
         run: |
           cd dbt/my_dbt_project
           dbt deps
 
 
-      - name: Build dbt & test dbt
+      - name: Test dbt
         run: |
           cd dbt/my_dbt_project
-          dbt build
+          dbt test
 
 
       - name: Generate dbt Docs
