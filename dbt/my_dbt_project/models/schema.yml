@@ -1,0 +1,99 @@
+models:
+
+  - name: dim_customers
+    columns:
+      - name: customer_id
+        data_tests:
+          - unique
+          - not_null
+      - name: full_name
+        data_tests:
+          - not_null
+      - name: full_name_cleaned
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_match_regex:
+              arguments:
+                regex: '^[A-Z][a-z]+\\s[A-Z][a-z]+$'
+
+      - name: first_name
+        data_tests:
+          - not_null 
+          - dbt_expectations.expect_column_values_to_match_regex:
+              arguments:
+                regex: '^[A-Z][a-z]+$'
+      - name: last_name
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_match_regex:
+              arguments:
+                regex: '^[A-Z][a-z]+$'
+      - name: customer_email
+        data_tests:
+          - not_null
+      - name: customer_state
+        data_tests:
+          - not_null
+      - name: customer_signup_date
+        data_tests:
+          - not_null
+
+
+  - name: dim_products
+    columns:
+      - name: product_id
+        data_tests:
+          - unique
+          - not_null
+      - name: product_name
+        data_tests:
+          - not_null
+      - name: product_price
+        data_tests:
+          - not_null
+
+
+  - name: fct_orders
+    columns:
+      - name: order_amount
+        data_tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments:
+                min_value: 0
+                strictly: true
+          - not_null
+      - name: customer_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: 'customer_id'
+      - name: product_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_products')
+                field: 'product_id'
+
+
+  - name: daily_sales
+    columns:
+      - name: order_date
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_match_regex:
+              arguments:
+                regex: '^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])$'
+
+
+  - name: monthly_sales
+    columns:
+      - name: year_months
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_match_regex:
+              arguments:
+                regex: '^[0-9]{4}-(0[1-9]|1[0-2])$'
+

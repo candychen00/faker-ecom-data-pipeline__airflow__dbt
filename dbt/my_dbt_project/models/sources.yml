@@ -1,0 +1,88 @@
+sources:
+  - name: faker
+    database: 'project-97ea2755-962c-466f-b6c'
+    schema: 'airflow_dbt_faker_ecom_raw'
+
+    tables:
+      - name: customers # alias
+        identifier: raw_customers # actual table name in bq
+        columns:
+          - name: name
+            data_tests:
+              - not_null
+          - name: email
+            data_tests:
+              - not_null
+          - name: state
+            data_tests:
+              - not_null
+          - name: customer_id
+            data_tests:
+              - not_null 
+              - unique  
+          - name: signup_date
+            data_tests:
+              - not_null
+
+      - name: products
+        identifier: raw_products
+        columns:
+          - name: price
+            data_tests:
+            - not_null
+            - dbt_expectations.expect_column_values_to_be_between:
+                arguments:
+                  min_value: 0
+                  strictly: true
+          - name: category
+            data_tests:
+            - not_null
+            - accepted_values:
+                arguments:
+                  values: ['Juice', 'Jam', 'Dried Snacks', 'Smoothie', 'Gummies']
+          - name: product_id
+            data_tests:
+            - not_null
+            - unique
+          - name: fruit
+            data_tests:
+            - not_null
+            - accepted_values:
+                arguments:
+                  values: ['Apple', 'Banana', 'Orange', 'Strawberry', 'Mango', 'Blueberry', 'Peach', 'Pineapple']
+
+ 
+      - name: orders
+        identifier: raw_orders
+        columns:
+          - name: order_at
+            data_tests:
+              - not_null
+          - name: order_id
+            data_tests:
+              - unique
+              - not_null
+          - name: quantity
+            data_tests:
+              - not_null
+              - dbt_expectations.expect_column_values_to_be_between:
+                  arguments:
+                    min_value: 0
+                    strictly: true
+          - name: created_at
+            data_tests:
+              - not_null
+          - name: product_id
+            data_tests:
+              - not_null
+              - relationships:
+                  arguments:
+                    to: source('faker', 'products')
+                    field: product_id
+          - name: customer_id
+            data_tests:
+              - not_null
+              - relationships:
+                  arguments:
+                    to: source('faker', 'customers')
+                    field: customer_id

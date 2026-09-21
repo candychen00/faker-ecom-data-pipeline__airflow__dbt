@@ -1,0 +1,15 @@
+# Replace 'my_bigquery_profile' with the exact profile name defined in your dbt_project.yml
+my_dbt_project:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      #method: service-account
+      #keyfile: ../secret/gcp-key.json           # Absolute path to your downloaded JSON key
+      project: "{{ env_var('GCP_PROJECT_ID') }}"      # The GCP project where BigQuery running
+      dataset: "airflow_dbt_faker_ecom"      # The default dataset dbt will build models in
+      threads: 1                         # Number of concurrent queries
+      timeout_seconds: 300               # Query execution timeout limit
+      priority: interactive              # 'interactive' or 'batch'
+      location: asia-east1

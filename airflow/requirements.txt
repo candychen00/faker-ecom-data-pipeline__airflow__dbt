@@ -1,0 +1,3 @@
+faker
+apache-airflow-providers-discord
+python-dotenv
