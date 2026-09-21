@@ -41,13 +41,21 @@ jobs:
           gcloud auth configure-docker ${{ env.GAR_LOCATION }}-docker.pkg.dev --quiet
 
 
-      # 4. Delete all images in GAR
+      # 4. Delete all images in GAR (skip if the package doesn't exist yet)
       - name: Delete all images and tags in GAR
         run: |
-          gcloud artifacts docker images delete \
-            ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }} \
-            --delete-tags \
-            --quiet
+          if gcloud artifacts packages describe ${{ env.IMAGE_NAME }} \
+              --repository=${{ env.REPOSITORY }} \
+              --location=${{ env.GAR_LOCATION }} \
+              --project=${{ secrets.GCP_PROJECT_ID }} \
+              --quiet > /dev/null 2>&1; then
+            gcloud artifacts docker images delete \
+              ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }} \
+              --delete-tags \
+              --quiet
+          else
+            echo "Package ${{ env.IMAGE_NAME }} not found in ${{ env.REPOSITORY }}, skipping delete."
+          fi
 
 
       # 5. 建置 Docker 映像檔
